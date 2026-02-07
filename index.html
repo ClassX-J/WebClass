@@ -1,1 +1,366 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Confidential - Detective Files</title>
+    <style>
+        /* =========================================
+           1. PENGATURAN UTAMA (EDIT DI SINI)
+           ========================================= */
+        :root {
+            /* Ganti link gambar background di sini */
+            --bg-image: url('walpaper.jpg');
+            
+            /* Palet Warna */
+            --folder-color: #f1e6bc;      
+            --paper-white: #fdfbf7;       
+            --ink-color: #1a1a1a;         
+            --stamp-red: #c0392b;         
+            --pin-color: #d35400;         
+        }
 
+        /* =========================================
+           2. STYLE DASAR
+           ========================================= */
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            background-image: var(--bg-image);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--ink-color);
+        }
+
+        .board-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: rgba(181, 145, 3, 0.4);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8) inset;
+        }
+
+        .case-title {
+            text-align: center;
+            color: #fff;
+            background: rgba(200, 0, 0, 0.6);
+            padding: 15px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            border: 2px solid #fff;
+            margin-bottom: 40px;
+            transform: rotate(-1deg);
+        }
+
+        .category-label {
+            background-color: var(--stamp-red);
+            color: white;
+            display: inline-block;
+            padding: 8px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin: 50px 0 30px 0;
+            text-transform: uppercase;
+            box-shadow: 3px 3px 5px rgba(0,0,0,0.5);
+            border: 1px dashed white;
+            transform: rotate(-2deg);
+        }
+
+        /* =========================================
+           3. FOTO SEKELAS (EVIDENCE)
+           ========================================= */
+        .evidence-photo {
+            background: white;
+            padding: 15px 15px 50px 15px;
+            width: 90%;
+            max-width: 700px;
+            margin: 0 auto;
+            transform: rotate(2deg);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        
+        .evidence-photo::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 30px;
+            background: rgba(200, 0, 0, 0.6);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .evidence-photo img {
+            width: 100%;
+            height: auto;
+            filter: sepia(20%) contrast(1.1);
+        }
+
+        .caption {
+            text-align: center;
+            font-family: 'Brush Script MT', cursive;
+            font-size: 1.5rem;
+            margin-top: 10px;
+            color: #333;
+        }
+
+        /* =========================================
+           4. STYLE KARTU STRUKTUR
+           ========================================= */
+        .card {
+            background-color: var(--folder-color);
+            padding: 12px;
+            border: 1px solid #cbbf95;
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.4);
+            text-align: center;
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .card:hover { transform: scale(1.05) rotate(0deg) !important; z-index: 10; }
+        
+        .card img {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            border: 4px solid white;
+            margin-bottom: 8px;
+            filter: grayscale(100%);
+        }
+        .card:hover img { filter: grayscale(0%); }
+
+        .role {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--stamp-red);
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--stamp-red);
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+        .name { font-size: 1rem; margin: 5px 0; font-weight: bold; }
+
+        .pin {
+            width: 12px;
+            height: 12px;
+            background: var(--pin-color);
+            border-radius: 50%;
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+            z-index: 2;
+        }
+
+        /* =========================================
+           5. LAYOUT GRID
+           ========================================= */
+        .wali-area { display: flex; justify-content: center; }
+        .core-team-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 25px;
+        }
+
+        .card:nth-child(odd) { transform: rotate(1.5deg); }
+        .card:nth-child(even) { transform: rotate(-1.5deg); }
+
+        /* =========================================
+           6. FITUR BARU: MOMEN (POLAROID GALLERY)
+           ========================================= */
+        .moments-grid {
+            display: grid;
+            /* Layout: Minimal lebar foto 250px, selebihnya menyesuaikan */
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            padding: 20px;
+        }
+
+        .polaroid-momen {
+            background: #fff;
+            padding: 15px 15px 50px 15px; /* Padding bawah besar utk tulisan */
+            box-shadow: 5px 10px 15px rgba(0,0,0,0.5);
+            transform: rotate(2deg);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .polaroid-momen:nth-child(even) { transform: rotate(-3deg); }
+        .polaroid-momen:hover { transform: scale(1.1) rotate(0deg); z-index: 20; }
+
+        .polaroid-momen img {
+            width: 100%;
+            height: 250px; /* Tinggi foto momen disamakan */
+            object-fit: cover;
+            filter: sepia(30%);
+            border: 1px solid #ccc;
+        }
+        
+        .polaroid-momen:hover img { filter: sepia(0%); }
+
+        .momen-caption {
+            font-family: 'Permanent Marker', cursive, sans-serif; /* Font tulisan tangan */
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1.2rem;
+            color: #333;
+            transform: rotate(-2deg);
+        }
+
+        /* Efek Klip Kertas */
+        .paper-clip {
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            width: 15px;
+            height: 40px;
+            border: 3px solid #bbb;
+            border-radius: 10px;
+            z-index: 5;
+            background: transparent;
+        }
+
+        @media (max-width: 600px) {
+            .core-team-grid .card { width: 40%; }
+            .case-title { font-size: 1.2rem; }
+            .moments-grid { gap: 20px; }
+        }
+
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="board-container">
+        
+        <h1 class="case-title"> TOP SECRET: CASE FILE X-J</h1>
+
+        <div class="evidence-photo">
+            <img src="hari.jpg" alt="Foto Kelas">
+            <div class="caption">The Squad Evidence</div>
+        </div>
+
+        <center><div class="category-label">UNIT CHIEF (WALI KELAS)</div></center>
+
+        <div class="wali-area">
+            <div class="card" style="width: 200px; transform: rotate(-2deg);">
+                <div class="pin"></div>
+                <img src="cantik.jpg" alt="Wali Kelas">
+                <div class="role">Pembimbing</div>
+                <div class="name">Bpk/Ibu Guru</div>
+            </div>
+        </div>
+
+        <center><div class="category-label">LEAD INVESTIGATORS (PENGURUS)</div></center>
+
+        <div class="core-team-grid">
+            <div class="card" style="width: 180px;">
+                <div class="pin"></div>
+                <img src="https://via.placeholder.com/200x260?text=KETUA" alt="Ketua">
+                <div class="role">Ketua Kelas</div>
+                <div class="name">Nama Ketua</div>
+            </div>
+            <div class="card" style="width: 180px;">
+                <div class="pin"></div>
+                <img src="https://via.placeholder.com/200x260?text=WAKIL" alt="Wakil">
+                <div class="role">Wakil Ketua</div>
+                <div class="name">Nama Wakil</div>
+            </div>
+             <div class="card" style="width: 180px;">
+                <div class="pin"></div>
+                <img src="https://via.placeholder.com/200x260?text=SEKRETARIS" alt="Sekretaris">
+                <div class="role">Sekretaris</div>
+                <div class="name">Nama Sekretaris</div>
+            </div>
+             <div class="card" style="width: 180px;">
+                <div class="pin"></div>
+                <img src="https://via.placeholder.com/200x260?text=BENDAHARA" alt="Bendahara">
+                <div class="role">Bendahara</div>
+                <div class="name">Nama Bendahara</div>
+            </div>
+        </div>
+
+        <center><div class="category-label">FIELD AGENTS (MURID)</div></center>
+
+        <div class="agents-grid">
+            <div class="card">
+                <div class="pin"></div>
+                <img src="https://via.placeholder.com/200x260?text=MURID" alt="Murid">
+                <div class="role">Agent 01</div>
+                <div class="name">Andi</div>
+            </div>
+            <div class="card">
+                <div class="pin"></div>
+                <img src="ganteng.jpg" alt="Murid">
+                <div class="role">Agent 02</div>
+                <div class="name">Budi</div>
+            </div>
+           
+             <div class="card">
+                <div class="pin"></div>
+                <img src="https://via.placeholder.com/200x260?text=MURID" alt="Murid">
+                <div class="role">Agent 01</div>
+                <div class="name">Andi</div>
+            </div>
+             <div class="card">
+                <div class="pin"></div>
+                <img src="https://via.placeholder.com/200x260?text=MURID" alt="Murid">
+                <div class="role">Agent 01</div>
+                <div class="name">Andi</div>
+            </div>
+             
+            </div>
+
+        <center>
+            <div class="category-label">EVIDENCE TIMELINE (MOMEN KELAS)</div>
+        </center>
+
+        <div class="moments-grid">
+            
+            <div class="polaroid-momen">
+                <div class="paper-clip"></div> <img src="sekelas2.jpg" alt="Momen">
+                <div class="momen-caption">Maulid</div>
+            </div>
+
+            <div class="polaroid-momen">
+                <div class="paper-clip"></div>
+                <img src="sekelas3.jpg" alt="Momen">
+                <div class="momen-caption">Pemilihan ketos</div>
+            </div>
+
+            <div class="polaroid-momen">
+                <div class="paper-clip"></div>
+                <img src="sekelas.jpeg" alt="Momen">
+                <div class="momen-caption">17 Agustus</div>
+            </div>
+
+            <div class="polaroid-momen">
+                <div class="paper-clip"></div>
+                <img src="hari.jpg" alt="Momen">
+                <div class="momen-caption">Hari Guru</div>
+            </div>
+              <div class="polaroid-momen">
+                <div class="paper-clip"></div>
+                <img src="hari.jpg" alt="Momen">
+                <div class="momen-caption">Hari Guru</div>
+            </div>
+              <div class="polaroid-momen">
+                <div class="paper-clip"></div>
+                <img src="hari.jpg" alt="Momen">
+                <div class="momen-caption">Hari Guru</div>
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
